@@ -1,3 +1,4 @@
+import edu.uci.ics.jung.algorithms.filters.KNeighborhoodFilter.EdgeType;
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
@@ -304,8 +305,14 @@ public class MainGUI {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				graph = new DirectedSparseMultigraph<String,String>();
-				for(Variable v : initVars){
-					graph.addVertex(v.toString());		
+				for(Variable initVar : initVars){
+					graph.addVertex(initVar.toString());	
+					for(Variable var : varArr){
+						graph.addVertex(var.toString());
+						if(initVar.getVarName().equals(var.getVarName())){
+							graph.addEdge(var.toString(), initVar.getVarName(),var.getVarName());
+						}
+					}
 				}
 				setUpGraph();
 			}
