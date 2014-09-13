@@ -13,6 +13,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
+import javax.security.auth.callback.LanguageCallback;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -35,14 +36,15 @@ import java.util.Map.Entry;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+
 public class MainGUI {
-	JTabbedPane tabbedPane;
+	private JTabbedPane tabbedPane;
 	private JFrame frame;
 	private JLabel varLabel, eventsLabel, initLabel,  whereLabel, thenLabel, endLabel, eventNameLabel;
 	private JTextField varTextField, initTextField, eventsTextField ,eventNameTextField, whereTextField, 
 	thenTextField;
-	private JButton addVar, addEvent,anotherEvent, addGuard, addAction, save;
-	private JPanel labelPanel, eventsPanel, varPanel;
+	private JButton addVar, addEvent,anotherEvent, addGuard, addAction, save, updateGraph;
+	private JPanel labelPanel, eventsPanel, varPanel, graphPanel;
 	private JTextField newVarTextField;
 	private int varCount = 0;
 	private boolean initFieldOn = false;
@@ -63,16 +65,20 @@ public class MainGUI {
 	private ArrayList<Guard> gArr = new ArrayList<Guard>();
 
 	public MainGUI(){
-		createGUI();
-	}
-	
-	public void createGUI(){
+		tabbedPane = new JTabbedPane();
+		JComponent panel1 = createEventBForm();
+		tabbedPane.addTab("Event-B Form", panel1);
 		
-	}
-	public void createEventBForm(){
-		frame = new JFrame("Event B Form");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JComponent panel2 = createEventBGraph();
+		tabbedPane.addTab("Event-B Graph", panel2);
+		
+		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+	}	
 	
+
+	public JComponent createEventBForm(){
+
+		
 		varLabel = new JLabel("VARIABLES");
 		eventsLabel =new JLabel("EVENTS");
 		initLabel = new JLabel("INITIALSATION");
@@ -236,7 +242,7 @@ public class MainGUI {
 												System.out.println("Value After is: " + v.toString());
 											}
 									}
-								}
+								};
 							}
 						}
 					}
@@ -250,11 +256,8 @@ public class MainGUI {
 		labelPanel.add(addVar);
 
 		labelPanel.add(save);
-		frame.pack();
-		frame.setSize(new Dimension(1300,760));
-		frame.add(scrPane);
-		frame.add(labelPanel);
-		frame.setVisible(true); 
+		return labelPanel;
+
 	}
 	public ArrayList<String> getAllConditions(){
 		conditions.add("=");
@@ -280,13 +283,27 @@ public class MainGUI {
 		return gArr;
 	}
 	
-	public void createEventBGraph(){
+	public JComponent createEventBGraph(){
+		graphPanel = new JPanel();
+		updateGraph = new JButton("Update Graph");
 		
+		graphPanel.add(updateGraph);
+		return graphPanel;
+	}
+	
+	public void createGUI(){
+		frame = new JFrame("Event B Visualizer");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.add(tabbedPane, BorderLayout.CENTER);
+		frame.pack();
+		frame.setSize(new Dimension(1300,760));
+		frame.setVisible(true); 
 	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		
+		MainGUI g = new MainGUI();
+		g.createGUI();
 	}
 
 }
