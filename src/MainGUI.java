@@ -74,6 +74,8 @@ public class MainGUI {
 	private Graph<String,String> graph;
 	private VisualizationViewer<String,String> gpanel;
 	private Layout<String,String> layout;
+	private ArrayList<String> initVarVals = new ArrayList<String>();
+	private ArrayList<String> newVarVals = new ArrayList<String>();
 
 	public MainGUI(){
 		tabbedPane = new JTabbedPane();
@@ -93,7 +95,12 @@ public class MainGUI {
 		varLabel = new JLabel("VARIABLES");
 		eventsLabel =new JLabel("EVENTS");
 		initLabel = new JLabel("INITIALSATION");
-		
+		for(Variable var : varArr){
+			graph.addVertex(var.toString());
+			if(initVar.getVarName().equals(var.getVarName())){
+				graph.addEdge(var.toString(), initVar.getVarName(),var.getVarName());
+			}
+		}
 		addVar = new JButton("Add new Variable");
 		addVar.addActionListener(new ActionListener() {
 			
@@ -306,14 +313,19 @@ public class MainGUI {
 				// TODO Auto-generated method stub
 				graph = new DirectedSparseMultigraph<String,String>();
 				for(Variable initVar : initVars){
-					graph.addVertex(initVar.toString());	
-					for(Variable var : varArr){
-						graph.addVertex(var.toString());
-						if(initVar.getVarName().equals(var.getVarName())){
-							graph.addEdge(var.toString(), initVar.getVarName(),var.getVarName());
-						}
+					initVarVals.add(initVar.getVarName());
+					graph.addVertex(initVar.toString());
+				}
+				for(Variable v : varArr){
+					newVarVals.add(v.getVarName());
+					graph.addVertex(v.toString());
+				}
+				for(String s : initVarVals){
+					if(newVarVals.contains(s)){
+						graph.addEdge(s.toString(),s,s);
 					}
 				}
+				
 				setUpGraph();
 			}
 		});
