@@ -1,3 +1,4 @@
+import edu.uci.ics.jung.algorithms.layout.CircleLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
@@ -52,7 +53,9 @@ public class MainGUI {
 	private boolean initFieldOn = false;
 	private boolean firstEventOn = false;
 	private Variable var;
+	private Variable initVar;
 	private ArrayList<Variable> varArr = new ArrayList<Variable>();
+	private ArrayList<Variable> initVars = new ArrayList<Variable>();
 	private int initCount;
 	private ArrayList<Container> varFieldContainer = new ArrayList<Container>();
 	private ArrayList<Container> initFieldcontainer = new ArrayList<Container>();
@@ -203,6 +206,8 @@ public class MainGUI {
 					String varValS = val[1];
 					Integer varVal = Integer.parseInt(varValS);
 					var = new Variable(varName, varVal);
+					initVar = new Variable(varName, varVal);
+					initVars.add(initVar);
 					varArr.add(var);
 				}
 				for(Component a : actionFieldContainer){
@@ -299,7 +304,7 @@ public class MainGUI {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				graph = new DirectedSparseMultigraph<String,String>();
-				for(Variable v : varArr){
+				for(Variable v : initVars){
 					graph.addVertex(v.toString());		
 				}
 				setUpGraph();
@@ -310,10 +315,10 @@ public class MainGUI {
 		return graphPanel;
 	}
 	public void setUpGraph(){
-		layout = new StaticLayout<>(graph);
-		layout.setSize(new Dimension(1300,760));
+		layout = new CircleLayout<>(graph);
+		layout.setSize(new Dimension(1360,760));
 		gpanel = new VisualizationViewer<String,String>(layout);
-		gpanel.setPreferredSize(new Dimension(500,500));
+		gpanel.setPreferredSize(new Dimension(1360,760));
 		gpanel.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
         gpanel.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
 		frame.add(gpanel);
