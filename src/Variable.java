@@ -33,6 +33,6 @@ public class Variable {
 		this.varValue = varValue;
 	}
 	public String toString(){
-		return varName + " : "  + varValue;
+		return varName + " = "  + varValue;
 	}
 }

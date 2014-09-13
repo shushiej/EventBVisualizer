@@ -1,5 +1,6 @@
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
+import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.graph.event.GraphEvent.Vertex;
@@ -38,6 +39,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 public class MainGUI {
+	//Form Variables
 	private JTabbedPane tabbedPane;
 	private JFrame frame;
 	private JLabel varLabel, eventsLabel, initLabel,  whereLabel, thenLabel, endLabel, eventNameLabel;
@@ -63,6 +65,11 @@ public class MainGUI {
 	private Assignment assign;
 	private ArrayList<Assignment> aArr = new ArrayList<Assignment>();
 	private ArrayList<Guard> gArr = new ArrayList<Guard>();
+	
+	//Graph Variables
+	private Graph<String,String> graph;
+	private VisualizationViewer<String,String> gpanel;
+	private Layout<String,String> layout;
 
 	public MainGUI(){
 		tabbedPane = new JTabbedPane();
@@ -286,9 +293,33 @@ public class MainGUI {
 	public JComponent createEventBGraph(){
 		graphPanel = new JPanel();
 		updateGraph = new JButton("Update Graph");
+		updateGraph.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				graph = new DirectedSparseMultigraph<String,String>();
+				for(Variable v : varArr){
+					graph.addVertex(v.toString());		
+				}
+				setUpGraph();
+			}
+		});
 		
 		graphPanel.add(updateGraph);
 		return graphPanel;
+	}
+	public void setUpGraph(){
+		layout = new StaticLayout<>(graph);
+		layout.setSize(new Dimension(1300,760));
+		gpanel = new VisualizationViewer<String,String>(layout);
+		gpanel.setPreferredSize(new Dimension(500,500));
+		gpanel.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
+        gpanel.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
+		frame.add(gpanel);
+		frame.pack();
+		frame.setVisible(true);
+		
 	}
 	
 	public void createGUI(){
