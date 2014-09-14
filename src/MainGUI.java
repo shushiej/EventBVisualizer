@@ -1,5 +1,6 @@
 import edu.uci.ics.jung.algorithms.filters.KNeighborhoodFilter.EdgeType;
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
@@ -76,6 +77,8 @@ public class MainGUI {
 	private Layout<String,String> layout;
 	private ArrayList<String> initVarVals = new ArrayList<String>();
 	private ArrayList<String> newVarVals = new ArrayList<String>();
+	private String initVarVal;
+	private String newVarVal;
 
 	public MainGUI(){
 		tabbedPane = new JTabbedPane();
@@ -313,18 +316,19 @@ public class MainGUI {
 				// TODO Auto-generated method stub
 				graph = new DirectedSparseMultigraph<String,String>();
 				for(Variable initVar : initVars){
-					initVarVals.add(initVar.getVarName());
-					graph.addVertex(initVar.toString());
-				}
-				for(Variable v : varArr){
-					newVarVals.add(v.getVarName());
-					graph.addVertex(v.toString());
-				}
-				for(String s : initVarVals){
-					if(newVarVals.contains(s)){
-						graph.addEdge(s.toString(),s,s);
+					initVarVal = initVar.getVarName();
+					initVarVals.add(initVarVal);
+					for(Variable v : varArr){
+						if(initVar.getVarName().equals(v.getVarName())){
+							graph.addEdge(initVar.toString(),initVar.toString(),v.toString());
+						}
+						newVarVal = v.getVarName();
+						newVarVals.add(newVarVal);
 					}
+					
 				}
+				
+				
 				
 				setUpGraph();
 			}
@@ -333,8 +337,14 @@ public class MainGUI {
 		graphPanel.add(updateGraph);
 		return graphPanel;
 	}
+	public String createEdge(int i){
+		return "Edge " + i;
+	}
+	public String createGuardEdge(Guard g){
+		return g.toString();
+	}
 	public void setUpGraph(){
-		layout = new CircleLayout<>(graph);
+		layout = new FRLayout<>(graph);
 		layout.setSize(new Dimension(1360,760));
 		gpanel = new VisualizationViewer<String,String>(layout);
 		gpanel.setPreferredSize(new Dimension(1360,760));
