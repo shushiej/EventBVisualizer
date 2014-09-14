@@ -188,7 +188,9 @@ public class EventBGUI extends JFrame implements ActionListener {
 					for(String con : conditions){
 						if(fullGuard.contains(con)){
 							condition = con;
-							String[] guardSplit = fullGuard.split(condition);
+							condition = condition.trim();
+							System.out.println(condition);
+							String[] guardSplit = fullGuard.split("\\"+condition);
 							String vName = guardSplit[0];
 							String vValS = guardSplit[1];
 							System.out.println("Value Before is: " + vName + " : " + vValS);

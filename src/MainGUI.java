@@ -260,7 +260,7 @@ public class MainGUI {
 									for(Assignment a : aArr){
 										if(guard.checkGuard(v)){
 											System.out.println("checked guard");
-											if(a.getVarName().equals(v.getVarName())){
+											if(a.getVarName().equals(v.getVarName())){ // Must be able to change the same value regardless of event name. 
 												a.update(v, a.getUpdateVal(), a.getCondition());
 												System.out.println("Value After is: " + v.toString());
 											}
@@ -320,15 +320,12 @@ public class MainGUI {
 					initVarVals.add(initVarVal);
 					for(Variable v : varArr){
 						if(initVar.getVarName().equals(v.getVarName())){
-							graph.addEdge(initVar.toString(),initVar.toString(),v.toString());
+							graph.addEdge(initVar.toString(),initVar.toString(),v.toString()); //Change the edge name to guard value
 						}
 						newVarVal = v.getVarName();
 						newVarVals.add(newVarVal);
 					}
-					
 				}
-				
-				
 				
 				setUpGraph();
 			}
