@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.*;
@@ -23,6 +24,7 @@ public class EventBGUI extends JFrame implements ActionListener {
 	private Variable var;
 	private ArrayList<Variable> varArr = new ArrayList<Variable>();
 	private int initCount;
+	private HashMap<String,Integer> varMap = new HashMap<String,Integer>();
 	private ArrayList<Container> varFieldContainer = new ArrayList<Container>();
 	private ArrayList<Container> initFieldcontainer = new ArrayList<Container>();
 	private ArrayList<Container> guardFieldContainer = new ArrayList<Container>();
@@ -150,7 +152,10 @@ public class EventBGUI extends JFrame implements ActionListener {
 		save = new JButton("Save Code");
 		//Stores all the values of the form
 		save.addActionListener(new ActionListener() {
-			
+			int varIndex =0;
+			String valStr;
+			int valIndex =0;
+			String guardCon;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				for(Component c : initFieldcontainer){
@@ -161,25 +166,7 @@ public class EventBGUI extends JFrame implements ActionListener {
 					Integer varVal = Integer.parseInt(varValS);
 					var = new Variable(varName, varVal);
 					varArr.add(var);
-				}
-				for(Component a : actionFieldContainer){
-					JTextField act = (JTextField) a;
-					String fullAction = act.getText();
-					actions = getAllActions();
-					for(String x: actions){
-						if(fullAction.contains(x)){
-							action = x;
-							action = action.trim();
-							String[] assignmentArr = fullAction.split("=");
-							String avName = assignmentArr[0].trim();
-							String assignment = assignmentArr[1].trim();
-							String update[] = assignment.split("\\"+action); 
-							String updateValS = update[1].trim();
-							Integer updateVal = Integer.parseInt(updateValS);
-							assign = new Assignment(avName, updateVal, action);
-							aArr.add(assign);	
-						}
-					}	
+					varMap.put(varName, varVal);
 				}
 				for(Component c : guardFieldContainer){
 					JTextField g = (JTextField) c;
@@ -187,34 +174,13 @@ public class EventBGUI extends JFrame implements ActionListener {
 					conditions = getAllConditions();
 					for(String con : conditions){
 						if(fullGuard.contains(con)){
-							condition = con;
-							condition = condition.trim();
-							System.out.println(condition);
-							String[] guardSplit = fullGuard.split("\\"+condition);
-							String vName = guardSplit[0];
-							String vValS = guardSplit[1];
-							System.out.println("Value Before is: " + vName + " : " + vValS);
-							Integer vValI =  Integer.parseInt(vValS);
-					
-							Guard guard = new Guard(vName, condition, vValI);
-							gArr.add(guard);
-							for(Variable v : varArr){
-								System.out.println("before guard");
-									for(Assignment a : aArr){
-										if(guard.checkGuard(v)){
-											System.out.println("checked guard");
-											if(a.getVarName().equals(v.getVarName())){
-												a.update(v, a.getUpdateVal(), a.getCondition());
-												System.out.println("Value After is: " + v.toString());
-											}
-									}
-								}
-							}
+							guardCon = con;	
 						}
 					}
-									
+					
+					
 				}
-			}	
+			}
 		});		
 		labelPanel = new JPanel();
 		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
