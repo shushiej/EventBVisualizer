@@ -12,11 +12,29 @@ import javax.swing.border.Border;
 
 public class EventBGUI extends JFrame implements ActionListener {
 	private JFrame frame;
-	private JLabel varLabel, eventsLabel, initLabel,  whereLabel, thenLabel, endLabel, eventNameLabel;
-	private JTextField varTextField, initTextField, eventsTextField ,eventNameTextField, whereTextField, 
+	private JLabel varLabel,
+	eventsLabel,
+	initLabel,  
+	whereLabel,
+	thenLabel, 
+	endLabel, 
+	eventNameLabel;
+	private JTextField varTextField, 
+initTextField, 
+eventsTextField ,
+eventNameTextField, 
+whereTextField, 
 	thenTextField;
-	private JButton addVar, addEvent,anotherEvent, addGuard, addAction, save;
-	private JPanel labelPanel, eventsPanel, varPanel;
+	private JButton addVar, 
+	addEvent,
+	anotherEvent, 
+	addGuard, 
+	addAction, 
+	save;
+	private JPanel 
+	labelPanel, 
+	eventsPanel,
+	varPanel;
 	private JTextField newVarTextField;
 	private int varCount = 0;
 	private boolean initFieldOn = false;
@@ -152,17 +170,19 @@ public class EventBGUI extends JFrame implements ActionListener {
 		save = new JButton("Save Code");
 		//Stores all the values of the form
 		save.addActionListener(new ActionListener() {
-			int varIndex =0;
-			String valStr;
-			int valIndex =0;
+			String guardStr;
+			Integer guardVal;
 			String guardCon;
+			String actionVar;
+			Integer actionVal;
+			String action;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				for(Component c : initFieldcontainer){
 					JTextField j = (JTextField) c;
 					String[] val = j.getText().split("=");
-					String varName = val[0];
-					String varValS = val[1];
+					String varName = val[0].trim();
+					String varValS = val[1].trim();
 					Integer varVal = Integer.parseInt(varValS);
 					var = new Variable(varName, varVal);
 					varArr.add(var);
@@ -175,12 +195,45 @@ public class EventBGUI extends JFrame implements ActionListener {
 					for(String con : conditions){
 						if(fullGuard.contains(con)){
 							guardCon = con;	
+							guardCon = guardCon.trim();
 						}
 					}
-					
-					
+					guardStr = getGuardVarName(fullGuard);
+					guardVal = getGuardVarValue(fullGuard);
+					Guard guard = new Guard(guardStr,guardCon,guardVal);
+					gArr.add(guard);
 				}
+				for(Variable v : varArr){
+					for(Guard g : gArr){
+						if(v.getVarName().equals(g.getGuardName())){
+							if(checkGuardCondition(g.getCondition(),v, g)){
+								for(Component a : actionFieldContainer){
+									JTextField act = (JTextField) a;
+									String fullAction = act.getText();
+									actions = getAllActions();
+									for(String ac : actions){
+										if(fullAction.contains(ac)){
+											action = ac;
+											action = action.trim();
+										}
+									}
+									String[] assignmentArr = fullAction.split("=");
+									actionVar = assignmentArr[0].trim();
+									String assignment = assignmentArr[1].trim();
+									String update[] = assignment.split("\\"+action); 
+									String updateValS = update[1].trim();
+									actionVal = Integer.parseInt(updateValS);
+									assign = new Assignment(actionVar, actionVal, action);
+									aArr.add(assign);
+									
+									
+							}
+						}
+					}
+				}
+				
 			}
+		}
 		});		
 		labelPanel = new JPanel();
 		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
@@ -193,6 +246,114 @@ public class EventBGUI extends JFrame implements ActionListener {
 		frame.add(scrPane);
 		frame.add(labelPanel);
 		frame.setVisible(true); 
+	}
+	public boolean checkGuardCondition(String con, Variable v, Guard g){
+		if(con.equals("=")){
+			if(v.getVarValue() == g.getConditionValue()){
+				return true;
+			}
+		else if(con.equals("<=")){
+			if(v.getVarValue() <= g.getConditionValue()){
+				return true;
+			}
+		}
+		else if(con.equals(">=")){
+			if(v.getVarValue() >= g.getConditionValue()){
+				return true;
+			}
+		}
+		else if(con.equals("!=")){
+			if(v.getVarValue() != g.getConditionValue()){
+				return true;
+			}
+		}
+		else if(con.equals("<")){
+			if(v.getVarValue() < g.getConditionValue()){
+				return true;
+			}
+		}
+		else if(con.equals(">")){
+			if(v.getVarValue() > g.getConditionValue()){
+				return true;
+			}
+		}
+		else {
+			return false;
+		}
+		}
+		return false;
+	}
+	public Integer getGuardVarValue(String s){
+		String delimiter;
+		String[] split;
+		String valString;
+		Integer val;
+		if(s.contains("<=")){
+			delimiter = "@";
+			s = s.replace("<=", delimiter);
+		}
+		else if(s.contains(">=")){
+			delimiter = "#";
+			s = s.replace(">=", delimiter);
+		}
+		else if(s.contains("!=")){
+			delimiter = "$";
+			s = s.replace("!=", delimiter);
+		}
+		else if(s.contains("<")){
+			delimiter = "<";
+			s = s.replace("<", delimiter);
+		}
+		else if(s.contains(">")){
+			delimiter = ">";
+			s = s.replace(">", delimiter);
+		}
+		else if(s.contains("=")){
+			delimiter = "=";
+			s = s.replace("=", delimiter);
+		}
+		else{
+			return 0;
+		}
+		split = s.split(delimiter);
+		valString = split[1];	
+		val = Integer.parseInt(valString);
+		return val;
+	}
+	public String getGuardVarName(String s){
+		String delimiter;
+		String[] split;
+		String valString;
+		if(s.contains("<=")){
+			delimiter = "@";
+			s = s.replace("<=", delimiter);
+		}
+		else if(s.contains(">=")){
+			delimiter = "#";
+			s = s.replace(">=", delimiter);
+		}
+		else if(s.contains("!=")){
+			delimiter = "$";
+			s = s.replace("!=", delimiter);
+		}
+		else if(s.contains("<")){
+			delimiter = "<";
+			s = s.replace("<", delimiter);
+		}
+		else if(s.contains(">")){
+			delimiter = ">";
+			s = s.replace(">", delimiter);
+		}
+		else if(s.contains("=")){
+			delimiter = "=";
+			s = s.replace("=", delimiter);
+		}
+		else{
+			return "No delimter found";
+		}
+		split = s.split(delimiter);
+		valString = split[0];		
+		return valString;
 	}
 	public void paintComponent(Graphics g){
 		super.paintComponents(g);
