@@ -176,6 +176,7 @@ whereTextField,
 			String actionVar;
 			Integer actionVal;
 			String action;
+			boolean readyToUpdate = false;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				for(Component c : initFieldcontainer){
@@ -225,6 +226,7 @@ whereTextField,
 									actionVal = Integer.parseInt(updateValS);
 									assign = new Assignment(actionVar, actionVal, action);
 									aArr.add(assign);
+									readyToUpdate = true;
 									
 									
 							}
@@ -233,6 +235,15 @@ whereTextField,
 				}
 				
 			}
+			//do the update here.
+			for(Variable v: varArr){
+				for(Assignment assign : aArr){
+					if(readyToUpdate){
+						
+					}
+				}
+			}
+			readyToUpdate = false;
 		}
 		});		
 		labelPanel = new JPanel();
