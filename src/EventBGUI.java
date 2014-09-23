@@ -202,6 +202,7 @@ whereTextField,
 					guardStr = getGuardVarName(fullGuard);
 					guardVal = getGuardVarValue(fullGuard);
 					Guard guard = new Guard(guardStr,guardCon,guardVal);
+					System.out.println(guard.getGuardName() + " "  + guard.getCondition() + " " + guard.getConditionValue());
 					gArr.add(guard);
 				}
 				for(Variable v : varArr){
@@ -239,7 +240,10 @@ whereTextField,
 			for(Variable v: varArr){
 				for(Assignment assign : aArr){
 					if(readyToUpdate){
-						
+						if(v.getVarName().equals(assign.getVarName())){
+							assign.update(v,assign.getUpdateVal(), assign.getCondition());
+							System.out.println(v.getVarName() +" : " +  v.getVarValue());
+						}
 					}
 				}
 			}
@@ -264,27 +268,27 @@ whereTextField,
 				return true;
 			}
 		else if(con.equals("<=")){
-			if(v.getVarValue() <= g.getConditionValue()){
+			if(v.getVarValue().intValue() <= g.getConditionValue().intValue() ){
 				return true;
 			}
 		}
 		else if(con.equals(">=")){
-			if(v.getVarValue() >= g.getConditionValue()){
+			if(v.getVarValue().intValue()  >= g.getConditionValue().intValue() ){
 				return true;
 			}
 		}
 		else if(con.equals("!=")){
-			if(v.getVarValue() != g.getConditionValue()){
+			if(v.getVarValue().intValue()  != g.getConditionValue().intValue() ){
 				return true;
 			}
 		}
 		else if(con.equals("<")){
-			if(v.getVarValue() < g.getConditionValue()){
+			if(v.getVarValue().intValue()  < g.getConditionValue().intValue() ){
 				return true;
 			}
 		}
 		else if(con.equals(">")){
-			if(v.getVarValue() > g.getConditionValue()){
+			if(v.getVarValue().intValue()  > g.getConditionValue().intValue() ){
 				return true;
 			}
 		}
