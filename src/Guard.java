@@ -48,34 +48,34 @@ public class Guard {
 					if(conditionValue == other.getVarValue()){
 						return true;
 					}
-					else if(condition.equals("<")){
-						if(conditionValue < other.getVarValue()){
+				}
+				else if(condition.equals("<")){
+					if(conditionValue < other.getVarValue()){
 							return true;
-						}
 					}
-					else if(condition.equals(">")){
-						if(conditionValue > other.getVarValue()){
+				}
+				else if(condition.equals(">")){
+					if(conditionValue > other.getVarValue()){
 							return true;
-						}
 					}
-					else if(condition.equals("<=")){
-						if(conditionValue <= other.getVarValue()){
+				}
+				else if(condition.equals("<=")){
+					if(conditionValue <= other.getVarValue()){
 							return true;
-						}
 					}
-					else if(condition.equals(">=")){
-						if(conditionValue >= other.getVarValue()){
-							return true;
-						}
+				}
+				else if(condition.equals(">=")){
+					if(conditionValue >= other.getVarValue()){
+						return true;
 					}
-					else if(condition.equals("!=")){
-						if(conditionValue != other.getVarValue()){
-							return true;
-						}
+				}
+				else if(condition.equals("!=")){
+					if(conditionValue != other.getVarValue()){
+						return true;
 					}
-					else{
-						return false;
-					}
+				}
+				else{
+					return false;
 				}
 			}
 		return false;

@@ -70,7 +70,7 @@ public class MainGUI {
 	private Assignment assign;
 	private ArrayList<Assignment> aArr = new ArrayList<Assignment>();
 	private ArrayList<Guard> gArr = new ArrayList<Guard>();
-	
+	private HashMap<String,Integer> varMap = new HashMap<String,Integer>();
 	//Graph Variables
 	private Graph<String,String> graph;
 	private VisualizationViewer<String,String> gpanel;
@@ -208,37 +208,26 @@ public class MainGUI {
 		//Stores all the values of the form
 		save.addActionListener(new ActionListener() {
 			
+			String guardStr;
+			Integer guardVal;
+			String guardCon;
+			String actionVar;
+			Integer actionVal;
+			String action;
+			boolean readyToUpdate = false;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				for(Component c : initFieldcontainer){
 					JTextField j = (JTextField) c;
 					String[] val = j.getText().split("=");
-					String varName = val[0];
-					String varValS = val[1];
+					String varName = val[0].trim();
+					String varValS = val[1].trim();
 					Integer varVal = Integer.parseInt(varValS);
 					var = new Variable(varName, varVal);
 					initVar = new Variable(varName, varVal);
 					initVars.add(initVar);
 					varArr.add(var);
-				}
-				for(Component a : actionFieldContainer){
-					JTextField act = (JTextField) a;
-					String fullAction = act.getText();
-					actions = getAllActions();
-					for(String x: actions){
-						if(fullAction.contains(x)){
-							action = x;
-							action = action.trim();
-							String[] assignmentArr = fullAction.split("=");
-							String avName = assignmentArr[0].trim();
-							String assignment = assignmentArr[1].trim();
-							String update[] = assignment.split("\\"+action); 
-							String updateValS = update[1].trim();
-							Integer updateVal = Integer.parseInt(updateValS);
-							assign = new Assignment(avName, updateVal, action);
-							aArr.add(assign);	
-						}
-					}	
+					varMap.put(varName, varVal);
 				}
 				for(Component c : guardFieldContainer){
 					JTextField g = (JTextField) c;
@@ -246,32 +235,58 @@ public class MainGUI {
 					conditions = getAllConditions();
 					for(String con : conditions){
 						if(fullGuard.contains(con)){
-							condition = con;
-							String[] guardSplit = fullGuard.split(condition);
-							String vName = guardSplit[0];
-							String vValS = guardSplit[1];
-							System.out.println("Value Before is: " + vName + " : " + vValS);
-							Integer vValI =  Integer.parseInt(vValS);
-					
-							Guard guard = new Guard(vName, condition, vValI);
-							gArr.add(guard);
-							for(Variable v : varArr){
-								System.out.println("before guard");
-									for(Assignment a : aArr){
-										if(guard.checkGuard(v)){
-											System.out.println("checked guard");
-											if(a.getVarName().equals(v.getVarName())){ // Must be able to change the same value regardless of event name. 
-												a.update(v, a.getUpdateVal(), a.getCondition());
-												System.out.println("Value After is: " + v.toString());
-											}
+							guardCon = con;	
+							guardCon = guardCon.trim();
+						}
+					}
+					guardStr = getGuardVarName(fullGuard);
+					guardVal = getGuardVarValue(fullGuard);
+					Guard guard = new Guard(guardStr,guardCon,guardVal);
+					System.out.println(guard.getGuardName() + " "  + guard.getCondition() + " " + guard.getConditionValue());
+					gArr.add(guard);
+				}
+				for(Variable v : varArr){
+					for(Guard g : gArr){
+						if(v.getVarName().equals(g.getGuardName())){
+							if(checkGuardCondition(g.getCondition(),v, g)){
+								for(Component a : actionFieldContainer){
+									JTextField act = (JTextField) a;
+									String fullAction = act.getText();
+									actions = getAllActions();
+									for(String ac : actions){
+										if(fullAction.contains(ac)){
+											action = ac;
+											action = action.trim();
+										}
 									}
-								};
+									String[] assignmentArr = fullAction.split("=");
+									actionVar = assignmentArr[0].trim();
+									String assignment = assignmentArr[1].trim();
+									String update[] = assignment.split("\\"+action); 
+									String updateValS = update[1].trim();
+									actionVal = Integer.parseInt(updateValS);
+									assign = new Assignment(actionVar, actionVal, action);
+									aArr.add(assign);
+									readyToUpdate = true;	
 							}
 						}
 					}
-									
 				}
+				
+			}
+			//do the update here.
+			for(Variable v: varArr){
+				for(Assignment assign : aArr){
+					if(readyToUpdate){
+						if(v.getVarName().equals(assign.getVarName())){
+							assign.update(v,assign.getUpdateVal(), assign.getCondition());
+							System.out.println(v.getVarName() +" : " +  v.getVarValue());
+						}
+					}
+				}		
 			}	
+			readyToUpdate = false;
+		}
 		});		
 		labelPanel = new JPanel();
 		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
@@ -333,6 +348,124 @@ public class MainGUI {
 		
 		graphPanel.add(updateGraph);
 		return graphPanel;
+	}
+	public boolean checkGuardCondition(String con, Variable v, Guard g){
+		if(con.equals("=")){
+			if(v.getVarValue() == g.getConditionValue()){
+				return true;
+			}
+		}
+		else if(con.contains("<=")){
+			System.out.println("Reached" + con);
+			if(v.getVarValue().intValue() <= g.getConditionValue().intValue() ){
+				System.out.println("Evaluated" + con);
+				return true;
+			}
+		}
+		else if(con.equals(">=")){
+			System.out.println("Reached" + con);
+			if(v.getVarValue().intValue()  >= g.getConditionValue().intValue() ){
+				System.out.println("Evaluated" + con);
+				return true;
+			}
+		}
+		else if(con.equals("!=")){
+			System.out.println("Reached" + con);
+			if(v.getVarValue().intValue()  != g.getConditionValue().intValue() ){
+				System.out.println("Evaluated" + con);
+				return true;
+			}
+		}
+		else if(con.equals("<")){
+			System.out.println("Reached" + con);
+			if(v.getVarValue().intValue()  < g.getConditionValue().intValue() ){
+				System.out.println("Evaluated" + con);
+				return true;
+			}
+		}
+		else if(con.equals(">")){
+			System.out.println("Reached" + con);
+			if(v.getVarValue().intValue()  > g.getConditionValue().intValue() ){
+				System.out.println("Evaluated" + con);
+				return true;
+			}
+		}
+		else {
+			return false;
+		}
+		return false;
+	}
+	public Integer getGuardVarValue(String s){
+		String delimiter;
+		String[] split;
+		String valString;
+		Integer val;
+		if(s.contains("<=")){
+			delimiter = "@";
+			s = s.replace("<=", delimiter);
+		}
+		else if(s.contains(">=")){
+			delimiter = "#";
+			s = s.replace(">=", delimiter);
+		}
+		else if(s.contains("!=")){
+			delimiter = "$";
+			s = s.replace("!=", delimiter);
+		}
+		else if(s.contains("<")){
+			delimiter = "<";
+			s = s.replace("<", delimiter);
+		}
+		else if(s.contains(">")){
+			delimiter = ">";
+			s = s.replace(">", delimiter);
+		}
+		else if(s.contains("=")){
+			delimiter = "=";
+			s = s.replace("=", delimiter);
+		}
+		else{
+			return 0;
+		}
+		split = s.split(delimiter);
+		valString = split[1];	
+		val = Integer.parseInt(valString);
+		return val;
+	}
+	public String getGuardVarName(String s){
+		String delimiter;
+		String[] split;
+		String valString;
+		if(s.contains("<=")){
+			delimiter = "@";
+			s = s.replace("<=", delimiter);
+		}
+		else if(s.contains(">=")){
+			delimiter = "#";
+			s = s.replace(">=", delimiter);
+		}
+		else if(s.contains("!=")){
+			delimiter = "$";
+			s = s.replace("!=", delimiter);
+		}
+		else if(s.contains("<")){
+			delimiter = "<";
+			s = s.replace("<", delimiter);
+		}
+		else if(s.contains(">")){
+			delimiter = ">";
+			s = s.replace(">", delimiter);
+		}
+		else if(s.contains("=")){
+			delimiter = "=";
+			s = s.replace("=", delimiter);
+		}
+		else{
+			return "No delimter found";
+		}
+		split = s.split(delimiter);
+		valString = split[0];		
+		return valString;
 	}
 	public String createEdge(int i){
 		return "Edge " + i;

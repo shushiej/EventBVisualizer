@@ -42,7 +42,9 @@ whereTextField,
 	private Variable var;
 	private ArrayList<Variable> varArr = new ArrayList<Variable>();
 	private int initCount;
+	private Variable initVar;
 	private HashMap<String,Integer> varMap = new HashMap<String,Integer>();
+	private ArrayList<Variable> initVars = new ArrayList<Variable>();
 	private ArrayList<Container> varFieldContainer = new ArrayList<Container>();
 	private ArrayList<Container> initFieldcontainer = new ArrayList<Container>();
 	private ArrayList<Container> guardFieldContainer = new ArrayList<Container>();
@@ -115,7 +117,7 @@ whereTextField,
 					}
 				labelPanel.add(eventNameLabel);
 				labelPanel.add(whereLabel);				
-				labelPanel.add(whereTextField);
+				labelPanel.add(whereTextField);	
 				guardFieldContainer.add(whereTextField);
 				labelPanel.add(addGuard);
 				labelPanel.add(thenLabel);
@@ -186,6 +188,8 @@ whereTextField,
 					String varValS = val[1].trim();
 					Integer varVal = Integer.parseInt(varValS);
 					var = new Variable(varName, varVal);
+					initVar = new Variable(varName, varVal);
+					initVars.add(initVar);
 					varArr.add(var);
 					varMap.put(varName, varVal);
 				}
@@ -227,9 +231,7 @@ whereTextField,
 									actionVal = Integer.parseInt(updateValS);
 									assign = new Assignment(actionVar, actionVal, action);
 									aArr.add(assign);
-									readyToUpdate = true;
-									
-									
+									readyToUpdate = true;	
 							}
 						}
 					}
@@ -245,8 +247,8 @@ whereTextField,
 							System.out.println(v.getVarName() +" : " +  v.getVarValue());
 						}
 					}
-				}
-			}
+				}		
+			}	
 			readyToUpdate = false;
 		}
 		});		
@@ -267,34 +269,44 @@ whereTextField,
 			if(v.getVarValue() == g.getConditionValue()){
 				return true;
 			}
-		else if(con.equals("<=")){
+		}
+		else if(con.contains("<=")){
+			System.out.println("Reached" + con);
 			if(v.getVarValue().intValue() <= g.getConditionValue().intValue() ){
+				System.out.println("Evaluated" + con);
 				return true;
 			}
 		}
 		else if(con.equals(">=")){
+			System.out.println("Reached" + con);
 			if(v.getVarValue().intValue()  >= g.getConditionValue().intValue() ){
+				System.out.println("Evaluated" + con);
 				return true;
 			}
 		}
 		else if(con.equals("!=")){
+			System.out.println("Reached" + con);
 			if(v.getVarValue().intValue()  != g.getConditionValue().intValue() ){
+				System.out.println("Evaluated" + con);
 				return true;
 			}
 		}
 		else if(con.equals("<")){
+			System.out.println("Reached" + con);
 			if(v.getVarValue().intValue()  < g.getConditionValue().intValue() ){
+				System.out.println("Evaluated" + con);
 				return true;
 			}
 		}
 		else if(con.equals(">")){
+			System.out.println("Reached" + con);
 			if(v.getVarValue().intValue()  > g.getConditionValue().intValue() ){
+				System.out.println("Evaluated" + con);
 				return true;
 			}
 		}
 		else {
 			return false;
-		}
 		}
 		return false;
 	}
