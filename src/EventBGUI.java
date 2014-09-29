@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -44,6 +45,7 @@ whereTextField,
 	private int initCount;
 	private Variable initVar;
 	private HashMap<String,Integer> varMap = new HashMap<String,Integer>();
+	private HashMap<Variable,Guard> varToGuardMap= new HashMap<Variable,Guard>();
 	private ArrayList<Variable> initVars = new ArrayList<Variable>();
 	private ArrayList<Container> varFieldContainer = new ArrayList<Container>();
 	private ArrayList<Container> initFieldcontainer = new ArrayList<Container>();
@@ -211,7 +213,9 @@ whereTextField,
 				}
 				for(Variable v : varArr){
 					for(Guard g : gArr){
+						varToGuardMap.put(v,g);
 						if(v.getVarName().equals(g.getGuardName())){
+							
 							if(checkGuardCondition(g.getCondition(),v, g)){
 								for(Component a : actionFieldContainer){
 									JTextField act = (JTextField) a;
@@ -238,17 +242,14 @@ whereTextField,
 				}
 				
 			}
+				
 			//do the update here.
-			for(Variable v: varArr){
 				for(Assignment assign : aArr){
 					if(readyToUpdate){
-						if(v.getVarName().equals(assign.getVarName())){
-							assign.update(v,assign.getUpdateVal(), assign.getCondition());
-							System.out.println(v.getVarName() +" : " +  v.getVarValue());
-						}
+						loopThrough(varToGuardMap,assign);
 					}
 				}		
-			}	
+				
 			readyToUpdate = false;
 		}
 		});		
@@ -263,6 +264,15 @@ whereTextField,
 		frame.add(scrPane);
 		frame.add(labelPanel);
 		frame.setVisible(true); 
+	}
+	public void loopThrough(HashMap<Variable,Guard> map, Assignment a){
+		for(Map.Entry<Variable, Guard> entry : map.entrySet()){
+			while(checkGuardCondition(entry.getValue().getCondition(), entry.getKey(), entry.getValue())){
+				a.update(entry.getKey(), a.getUpdateVal(), a.getCondition());
+				System.out.println(entry.getKey().getVarName() + "  :  " + entry.getKey().getVarValue());
+			}
+		}
+		
 	}
 	public boolean checkGuardCondition(String con, Variable v, Guard g){
 		if(con.equals("=")){

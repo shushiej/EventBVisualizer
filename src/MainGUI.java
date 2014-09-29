@@ -36,6 +36,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.*;
@@ -71,6 +72,7 @@ public class MainGUI {
 	private ArrayList<Assignment> aArr = new ArrayList<Assignment>();
 	private ArrayList<Guard> gArr = new ArrayList<Guard>();
 	private HashMap<String,Integer> varMap = new HashMap<String,Integer>();
+	private HashMap<Variable,Guard> varToGuardMap = new HashMap<Variable,Guard>();
 	//Graph Variables
 	private Graph<String,String> graph;
 	private VisualizationViewer<String,String> gpanel;
@@ -248,6 +250,7 @@ public class MainGUI {
 				for(Variable v : varArr){
 					for(Guard g : gArr){
 						if(v.getVarName().equals(g.getGuardName())){
+							varToGuardMap.put(v,g);
 							if(checkGuardCondition(g.getCondition(),v, g)){
 								for(Component a : actionFieldContainer){
 									JTextField act = (JTextField) a;
@@ -275,16 +278,11 @@ public class MainGUI {
 				
 			}
 			//do the update here.
-			for(Variable v: varArr){
 				for(Assignment assign : aArr){
 					if(readyToUpdate){
-						if(v.getVarName().equals(assign.getVarName())){
-							assign.update(v,assign.getUpdateVal(), assign.getCondition());
-							System.out.println(v.getVarName() +" : " +  v.getVarValue());
-						}
+						loopThrough(varToGuardMap, assign);
 					}
-				}		
-			}	
+				}			
 			readyToUpdate = false;
 		}
 		});		
@@ -296,6 +294,15 @@ public class MainGUI {
 		labelPanel.add(save);
 		return labelPanel;
 
+	}
+	public void loopThrough(HashMap<Variable,Guard> map, Assignment a){
+		for(Map.Entry<Variable, Guard> entry : map.entrySet()){
+			while(checkGuardCondition(entry.getValue().getCondition(), entry.getKey(), entry.getValue())){
+				a.update(entry.getKey(), a.getUpdateVal(), a.getCondition());
+				System.out.println(entry.getKey().getVarName() + "  :  " + entry.getKey().getVarValue());
+			}
+		}
+		
 	}
 	public ArrayList<String> getAllConditions(){
 		conditions.add("=");
