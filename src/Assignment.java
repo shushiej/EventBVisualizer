@@ -59,5 +59,8 @@ public class Assignment {
 			}
 
 	}
+	public String toString(){
+		return getVarName() + " " + getCondition() + getUpdateVal();
+	}
 
 }

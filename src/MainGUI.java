@@ -81,6 +81,11 @@ public class MainGUI {
 	private ArrayList<String> newVarVals = new ArrayList<String>();
 	private String initVarVal;
 	private String newVarVal;
+	private EventB eb;
+	private HashMap<ArrayList<Guard>, ArrayList<Assignment>> gMap;
+	private boolean singleUpdate;
+	private boolean multipleUpdate;
+	private ArrayList<Assignment> multiAArr;
 
 	public MainGUI(){
 		tabbedPane = new JTabbedPane();
@@ -171,7 +176,6 @@ public class MainGUI {
 		});
 		JScrollPane scrPane = new JScrollPane(labelPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		addGuard = new JButton("Add new Guard");
-
 		addAction = new JButton("Add new Action");
 		anotherEvent =new JButton("Add Another Event");
 		anotherEvent.addActionListener(new ActionListener() {
@@ -262,15 +266,47 @@ public class MainGUI {
 											action = action.trim();
 										}
 									}
-									String[] assignmentArr = fullAction.split("=");
-									actionVar = assignmentArr[0].trim();
-									String assignment = assignmentArr[1].trim();
-									String update[] = assignment.split("\\"+action); 
-									String updateValS = update[1].trim();
-									actionVal = Integer.parseInt(updateValS);
-									assign = new Assignment(actionVar, actionVal, action);
-									aArr.add(assign);
-									readyToUpdate = true;	
+									if(fullAction.contains(";")){
+										String[] multiactions = fullAction.split(";");
+										String act1 = multiactions[0];
+										String act2 = multiactions[1];
+										String[] aArrOne = act1.split("=");
+										String[] aArrTwo = act2.split("=");
+										String actVarOne = aArrOne[0].trim();
+										String actVarTwo = aArrTwo[0].trim();
+										String assignOne = aArrOne[1].trim();
+										String assignTwo = aArrTwo[1].trim();
+										String[] updateOneArr = assignOne.split("\\"+action);
+										String[] updateTwoArr = assignTwo.split("\\"+action);
+										String updateValOne = updateOneArr[1].trim();
+										String updateValTwo = updateTwoArr[1].trim();
+										Integer actValOne = Integer.parseInt(updateValOne);
+										Integer actValTwo = Integer.parseInt(updateValTwo);
+										Assignment a1 = new Assignment(actVarOne,actValOne,action);
+										Assignment a2 = new Assignment(actVarTwo,actValTwo,action);
+										System.out.println(a1.toString() + " & " +  a2.toString());
+										multiAArr.add(a1);
+										multiAArr.add(a2);
+										multipleUpdate = true;
+										eb = new EventB(varArr,gArr,multiAArr);
+										singleUpdate = false;
+									}
+									else{
+										String[] assignmentArr = fullAction.split("=");
+										actionVar = assignmentArr[0].trim();
+										String assignment = assignmentArr[1].trim();
+										String update[] = assignment.split("\\"+action); 
+										String updateValS = update[1].trim();
+										actionVal = Integer.parseInt(updateValS);
+										assign = new Assignment(actionVar, actionVal, action);
+										aArr.add(assign);
+										singleUpdate = true;
+										multipleUpdate = false;
+										readyToUpdate = true;	
+										eb = new EventB(varArr,gArr,aArr);
+									}
+									//eb.provideLink(gArr, aArr);
+								
 							}
 						}
 					}
@@ -292,17 +328,23 @@ public class MainGUI {
 		labelPanel.add(addVar);
 
 		labelPanel.add(save);
+		
 		return labelPanel;
 
 	}
 	public void loopThrough(HashMap<Variable,Guard> map, Assignment a){
 		for(Map.Entry<Variable, Guard> entry : map.entrySet()){
+			if(singleUpdate){
 			while(checkGuardCondition(entry.getValue().getCondition(), entry.getKey(), entry.getValue())){
 				a.update(entry.getKey(), a.getUpdateVal(), a.getCondition());
 				System.out.println(entry.getKey().getVarName() + "  :  " + entry.getKey().getVarValue());
 			}
-		}
+			}
 		
+			else if(multipleUpdate){
+				
+			}
+		}
 	}
 	public ArrayList<String> getAllConditions(){
 		conditions.add("=");
@@ -340,10 +382,13 @@ public class MainGUI {
 				for(Variable initVar : initVars){
 					initVarVal = initVar.getVarName();
 					initVarVals.add(initVarVal);
+					graph.addVertex(initVar.toString());
 					for(Variable v : varArr){
 						if(initVar.getVarName().equals(v.getVarName())){
 							graph.addEdge(initVar.toString(),initVar.toString(),v.toString()); //Change the edge name to guard value
 						}
+						gMap = eb.getGToAMap();
+						
 						newVarVal = v.getVarName();
 						newVarVals.add(newVarVal);
 					}
